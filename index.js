@@ -1,12 +1,18 @@
-import { getHTML, getInstaFollowers } from "./lib/scraper";
+import express from "express";
+import { getInstaFollowers } from "./lib/scraper";
+import db from "./lib/db";
+/**
+ * just importing the cron file to the index will kick the
+ * cron job to activate
+ * */
 
-async function go() {
-  //grabs the HTML of the page
-  const count = await getInstaFollowers(
-    await getHTML("https://www.instagram.com/delargo86/")
-  );
+const app = express();
 
-  console.log(`You have ${count} followers on Instagram`);
-}
+app.get("/scrape", async (req, res, next) => {
+  console.log("Scraping!");
+  const [followers, following, posts] = await getInstaFollowers();
 
-go();
+  res.json({ followers, following, posts });
+});
+
+app.listen(3000, () => console.log("Server running at Port 3000"));
